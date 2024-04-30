@@ -12,6 +12,7 @@ class ForecastPage extends StatefulWidget {
   _ForecastPageState createState() => _ForecastPageState();
 }
 
+
 class _ForecastPageState extends State<ForecastPage> {
   final _weatherService = WeatherService('ae10c6c9a4c9bf10931995caa1616edd');
   Map<String, List<Weather>>? _forecastByDate;
@@ -52,8 +53,18 @@ class _ForecastPageState extends State<ForecastPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('5-Day Forecast'),
-      ),
+  backgroundColor: Colors.grey, // Set background color to grey
+  title: Text(
+    widget.weather?.cityName ?? "Location",
+    style: TextStyle(
+      fontFamily: 'Helvetica',
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+  ),
+),
+
       body: _forecastByDate == null
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -81,53 +92,50 @@ class _ForecastPageState extends State<ForecastPage> {
                       itemBuilder: (context, index) {
                         final forecast = forecastList[index];
                         return ListTile(
-  title: Text(
-    DateFormat('HH:mm').format(forecast.date),
-    style: TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 18,
-      color: Colors.white, // Set text color to khaki
-      fontFamily: 'Helvetica', // Set font family to Helvetica
-    ),
-  ),
-  subtitle: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          Text(
-            '${forecast.temperature.round()}°C, ',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white, // Set text color to khaki
-              fontFamily: 'Helvetica', // Set font family to Helvetica
-            ),
-          ),
-          Text(
-            forecast.mainCondition,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white, // Set text color to khaki
-              fontFamily: 'Helvetica', // Set font family to Helvetica
-            ),
-          ),
-        ],
-      ),
-      SizedBox(height: 4),
-Text(
-  'Humidity: ${forecast.humidity}%, Wind Speed: ${forecast.windSpeed.toStringAsFixed(2)} km/h',
-  style: TextStyle(
-    fontSize: 16,
-    color: Colors.white, // Set text color to white
-    fontFamily: 'Helvetica', // Set font family to Helvetica
-  ),
-),
-
-    ],
-  ),
-);
-
-
+                          title: Text(
+                            DateFormat('HH:mm').format(forecast.date),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.white, // Set text color to khaki
+                              fontFamily: 'Helvetica', // Set font family to Helvetica
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '${forecast.temperature.round()}°C, ',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white, // Set text color to khaki
+                                      fontFamily: 'Helvetica', // Set font family to Helvetica
+                                    ),
+                                  ),
+                                  Text(
+                                    forecast.mainCondition,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white, // Set text color to khaki
+                                      fontFamily: 'Helvetica', // Set font family to Helvetica
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Humidity: ${forecast.humidity}%, Wind Speed: ${forecast.windSpeed.toStringAsFixed(2)} km/h',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white, // Set text color to white
+                                  fontFamily: 'Helvetica', // Set font family to Helvetica
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
                       },
                     ),
                     Divider(),

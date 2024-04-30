@@ -1,5 +1,6 @@
 class Weather {
   final String cityName;
+  final String countryName; // Add country name property
   final double temperature;
   final String mainCondition;
   final DateTime date;
@@ -10,6 +11,7 @@ class Weather {
 
   Weather({
     required this.cityName,
+    required this.countryName, // Add country name parameter
     required this.temperature,
     required this.mainCondition,
     required this.date,
@@ -26,6 +28,7 @@ class Weather {
 
     return Weather(
       cityName: json['name'] ?? '',
+      countryName: json['sys']['country'] ?? '', // Parse country name from JSON
       temperature: mainJson?['temp']?.toDouble() ?? 0.0,
       mainCondition: weatherJson is List && weatherJson.isNotEmpty ? weatherJson[0]['main'] ?? '' : '',
       date: DateTime.parse(json['dt_txt'] ?? '1900-01-01 00:00:00'),

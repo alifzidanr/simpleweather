@@ -172,41 +172,70 @@ _fetchWeatherByCity(String city) async {
       ),
       home: Scaffold(
         appBar: AppBar(
-  title: _currentIndex == 0 ? Autocomplete<String>( // Conditional rendering of Autocomplete widget
-    optionsBuilder: (TextEditingValue textEditingValue) {
-      final query = textEditingValue.text;
-      if (query.isEmpty) {
-        return [];
-      } else {
-        return _cachedSuggestions[query] ?? [];
-      }
-    },
-    onSelected: (String selectedValue) {
-      _searchController.text = selectedValue;
-      _fetchWeatherByCity(selectedValue);
-    },
-    fieldViewBuilder: (BuildContext context,
-        TextEditingController textEditingController,
-        FocusNode focusNode,
-        VoidCallback onFieldSubmitted) {
-      return TextField(
-        controller: textEditingController,
-        focusNode: focusNode,
-        decoration: InputDecoration(
-          hintText: 'Search',
-          border: OutlineInputBorder(),
-          suffixIcon: _isLoading
-              ? CircularProgressIndicator()
-              : null,
-        ),
-        onChanged: _onSearchTextChanged,
-        onSubmitted: (value) {
-          _fetchWeatherByCity(value);
-        },
-      );
-    },
-  ) : null, // Set to null if _currentIndex is not 0
+  backgroundColor: Colors.grey[800], // Set background color for the app bar
+  title: _currentIndex == 0
+      ? Row(
+          children: [
+            Expanded(
+              child: Autocomplete<String>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  final query = textEditingValue.text;
+                  if (query.isEmpty) {
+                    return [];
+                  } else {
+                    return _cachedSuggestions[query] ?? [];
+                  }
+                },
+                onSelected: (String selectedValue) {
+                  _searchController.text = selectedValue;
+                  _fetchWeatherByCity(selectedValue);
+                },
+                fieldViewBuilder: (BuildContext context,
+                    TextEditingController textEditingController,
+                    FocusNode focusNode,
+                    VoidCallback onFieldSubmitted) {
+                  return Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0), // Add padding to the text field
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900], // Set background color for the text field
+                      borderRadius: BorderRadius.circular(8.0), // Set border radius for the text field
+                    ),
+                    child: TextField(
+                      controller: textEditingController,
+                      focusNode: focusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        border: InputBorder.none, // Remove border
+                        suffixIcon: _isLoading
+                            ? CircularProgressIndicator()
+                            : null,
+                      ),
+                      onChanged: _onSearchTextChanged,
+                      onSubmitted: (value) {
+                        _fetchWeatherByCity(value);
+                      },
+                      style: TextStyle(color: Colors.white), // Set text color for the text field
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        )
+      : Center(
+    child: Text(
+      'Forecasts',
+      style: TextStyle(
+        color: Colors.white, // Set text color to white
+        fontFamily: 'Helvetica', // Set font family to Helvetica
+        fontSize: 22, // Set font size to 22
+        fontWeight: FontWeight.bold, // Set font weight to bold
+      ),
+    ),
+  ), // Keep the title for _currentIndex == 0
+
 ),
+
 
 
        body: _currentIndex == 0
@@ -230,45 +259,47 @@ _fetchWeatherByCity(String city) async {
     );
   }
        Widget weatherBody() {
-    return SingleChildScrollView(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.location_on,
-              color: Colors.white,
-              size: 24,
+  return SingleChildScrollView(
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.location_on,
+            color: Colors.white,
+            size: 24,
+          ),
+          SizedBox(height: 8),
+          Text(
+            "${_weather?.cityName ?? "Location"}, ${_weather?.countryName ?? ""}",
+            // Display city name and country name if available
+          ),
+          Visibility(
+            visible: _weather != null,
+            child: Column(
+              children: [
+                Lottie.asset(getWeatherAnimation(_weather?.mainCondition)),
+                Text(
+                  "${_weather?.temperature.round()}°C",
+                ),
+                Text(
+                  _weather?.mainCondition ?? "",
+                ),
+              ],
             ),
-            SizedBox(height: 8),
-            Text(
-              _weather?.cityName ?? "Location",
+          ),
+          Visibility(
+            visible: _showFetchWeatherButton,
+            child: ElevatedButton(
+              onPressed: _fetchWeather,
+              child: Text("Weather on my location"),
             ),
-            Visibility(
-              visible: _weather != null,
-              child: Column(
-                children: [
-                  Lottie.asset(getWeatherAnimation(_weather?.mainCondition)),
-                  Text(
-                    "${_weather?.temperature.round()}°C",
-                  ),
-                  Text(
-                    _weather?.mainCondition ?? "",
-                  ),
-                ],
-              ),
-            ),
-            Visibility(
-              visible: _showFetchWeatherButton,
-              child: ElevatedButton(
-                onPressed: _fetchWeather,
-                child: Text("Weather on my location"),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
   }

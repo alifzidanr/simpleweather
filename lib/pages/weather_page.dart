@@ -172,42 +172,42 @@ _fetchWeatherByCity(String city) async {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Autocomplete<String>(
-            optionsBuilder: (TextEditingValue textEditingValue) {
-                final query = textEditingValue.text;
-                if (query.isEmpty) {
-                  return [];
-                } else {
-                  return _cachedSuggestions[query] ?? [];
-                }
-              },
-
-            onSelected: (String selectedValue) {
-              _searchController.text = selectedValue;
-              _fetchWeatherByCity(selectedValue);
-            },
-            fieldViewBuilder: (BuildContext context,
-                TextEditingController textEditingController,
-                FocusNode focusNode,
-                VoidCallback onFieldSubmitted) {
-              return TextField(
-                controller: textEditingController,
-                focusNode: focusNode,
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  border: OutlineInputBorder(),
-                  suffixIcon: _isLoading
-                      ? CircularProgressIndicator()
-                      : null,
-                ),
-                onChanged: _onSearchTextChanged,
-                onSubmitted: (value) {
-                  _fetchWeatherByCity(value);
-                },
-              );
-            },
-          ),
+  title: _currentIndex == 0 ? Autocomplete<String>( // Conditional rendering of Autocomplete widget
+    optionsBuilder: (TextEditingValue textEditingValue) {
+      final query = textEditingValue.text;
+      if (query.isEmpty) {
+        return [];
+      } else {
+        return _cachedSuggestions[query] ?? [];
+      }
+    },
+    onSelected: (String selectedValue) {
+      _searchController.text = selectedValue;
+      _fetchWeatherByCity(selectedValue);
+    },
+    fieldViewBuilder: (BuildContext context,
+        TextEditingController textEditingController,
+        FocusNode focusNode,
+        VoidCallback onFieldSubmitted) {
+      return TextField(
+        controller: textEditingController,
+        focusNode: focusNode,
+        decoration: InputDecoration(
+          hintText: 'Search',
+          border: OutlineInputBorder(),
+          suffixIcon: _isLoading
+              ? CircularProgressIndicator()
+              : null,
         ),
+        onChanged: _onSearchTextChanged,
+        onSubmitted: (value) {
+          _fetchWeatherByCity(value);
+        },
+      );
+    },
+  ) : null, // Set to null if _currentIndex is not 0
+),
+
 
        body: _currentIndex == 0
             ? weatherBody()

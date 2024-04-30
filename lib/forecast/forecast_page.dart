@@ -53,12 +53,12 @@ class _ForecastPageState extends State<ForecastPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-  backgroundColor: Colors.grey, // Set background color to grey
+  backgroundColor: Colors.grey[900], // Set background color to grey
   title: Text(
-    widget.weather?.cityName ?? "Location",
+    "${widget.weather?.cityName ?? "Location"}, ${widget.weather?.countryName ?? ""}",
     style: TextStyle(
       fontFamily: 'Helvetica',
-      fontSize: 22,
+      fontSize: 20,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),

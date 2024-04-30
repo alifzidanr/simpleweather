@@ -161,103 +161,107 @@ _fetchWeatherByCity(String city) async {
 }
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'Helvetica',
-        scaffoldBackgroundColor: Colors.grey[800],
-        textTheme: TextTheme(
-          bodyText2: TextStyle(color: Colors.white, fontSize: 24),
-        ),
+Widget build(BuildContext context) {
+  return MaterialApp(
+    theme: ThemeData(
+      fontFamily: 'Helvetica',
+      scaffoldBackgroundColor: Colors.grey[800],
+      textTheme: TextTheme(
+        bodyText2: TextStyle(color: Colors.white, fontSize: 24),
       ),
-      home: Scaffold(
-        appBar: AppBar(
-  backgroundColor: Colors.grey[800], // Set background color for the app bar
-  title: _currentIndex == 0
-      ? Row(
-          children: [
-            Expanded(
-              child: Autocomplete<String>(
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  final query = textEditingValue.text;
-                  if (query.isEmpty) {
-                    return [];
-                  } else {
-                    return _cachedSuggestions[query] ?? [];
-                  }
-                },
-                onSelected: (String selectedValue) {
-                  _searchController.text = selectedValue;
-                  _fetchWeatherByCity(selectedValue);
-                },
-                fieldViewBuilder: (BuildContext context,
-                    TextEditingController textEditingController,
-                    FocusNode focusNode,
-                    VoidCallback onFieldSubmitted) {
-                  return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0), // Add padding to the text field
-                    decoration: BoxDecoration(
-                      color: Colors.grey[900], // Set background color for the text field
-                      borderRadius: BorderRadius.circular(8.0), // Set border radius for the text field
-                    ),
-                    child: TextField(
-                      controller: textEditingController,
-                      focusNode: focusNode,
-                      decoration: InputDecoration(
-                        hintText: 'Search',
-                        border: InputBorder.none, // Remove border
-                        suffixIcon: _isLoading
-                            ? CircularProgressIndicator()
-                            : null,
-                      ),
-                      onChanged: _onSearchTextChanged,
-                      onSubmitted: (value) {
-                        _fetchWeatherByCity(value);
+    ),
+    home: Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey[800], // Set background color for the app bar
+        title: _currentIndex == 0
+            ? Row(
+                children: [
+                  Expanded(
+                    child: Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        final query = textEditingValue.text;
+                        if (query.isEmpty) {
+                          return [];
+                        } else {
+                          return _cachedSuggestions[query] ?? [];
+                        }
                       },
-                      style: TextStyle(color: Colors.white), // Set text color for the text field
+                      onSelected: (String selectedValue) {
+                        _searchController.text = selectedValue;
+                        _fetchWeatherByCity(selectedValue);
+                      },
+                      fieldViewBuilder: (BuildContext context,
+                          TextEditingController textEditingController,
+                          FocusNode focusNode,
+                          VoidCallback onFieldSubmitted) {
+                        return Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0), // Add padding to the text field
+                          decoration: BoxDecoration(
+                            color: Colors.grey[900], // Set background color for the text field
+                            borderRadius: BorderRadius.circular(8.0), // Set border radius for the text field
+                          ),
+                          child: TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            decoration: InputDecoration(
+                              hintText: 'Search by city or country...',
+                              hintStyle: TextStyle(color: Colors.white),
+                              border: InputBorder.none, // Remove border
+                              suffixIcon: _isLoading
+                                  ? CircularProgressIndicator()
+                                  : null,
+                            ),
+                            onChanged: _onSearchTextChanged,
+                            onSubmitted: (value) {
+                              _fetchWeatherByCity(value);
+                            },
+                            style: TextStyle(color: Colors.white), // Set text color for the text field
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
-          ],
-        )
-      : Center(
+                  ),
+                ],
+              )
+            : Container(
+    alignment: Alignment.center,
     child: Text(
       'Forecasts',
       style: TextStyle(
-        color: Colors.white, // Set text color to white
-        fontFamily: 'Helvetica', // Set font family to Helvetica
-        fontSize: 22, // Set font size to 22
-        fontWeight: FontWeight.bold, // Set font weight to bold
+        color: Colors.white,
+        fontSize: 22,
+        fontFamily: 'Helvetica',
+        fontWeight: FontWeight.bold,
       ),
     ),
-  ), // Keep the title for _currentIndex == 0
-
-),
-
-
-
-       body: _currentIndex == 0
-            ? weatherBody()
-            : ForecastPage(weather: _weather), // Show ForecastPage when index is 1
-        bottomNavigationBar: BottomNavigationBar(
-          onTap: onTabTapped,
-          currentIndex: _currentIndex,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.cloud),
-              label: 'Weather',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.access_time),
-              label: 'Forecast', // Label for ForecastPage
-            ),
-          ],
-        ),
+  ), // Remove app bar when index is not 0
       ),
-    );
-  }
+      body: _currentIndex == 0
+          ? Padding(
+              padding: EdgeInsets.only(top: 24.0), // Add padding to the top of the body
+              child: weatherBody(),
+            )
+          : ForecastPage(weather: _weather), // Show ForecastPage when index is 1
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.cloud),
+            label: 'Weather',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.access_time),
+            label: 'Forecast', // Label for ForecastPage
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
+
        Widget weatherBody() {
   return SingleChildScrollView(
     child: Center(
@@ -280,20 +284,25 @@ _fetchWeatherByCity(String city) async {
             child: Column(
               children: [
                 Lottie.asset(getWeatherAnimation(_weather?.mainCondition)),
+                SizedBox(height: 8), // Add vertical spacing between Lottie animation and temperature
                 Text(
                   "${_weather?.temperature.round()}°C",
                 ),
                 Text(
                   _weather?.mainCondition ?? "",
                 ),
+                SizedBox(height: 16), // Add vertical padding between weather condition and button
+                Visibility(
+                  visible: _showFetchWeatherButton,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 16), // Add top padding
+                    child: ElevatedButton(
+                      onPressed: _fetchWeather,
+                      child: Text("Weather on my location"),
+                    ),
+                  ),
+                ),
               ],
-            ),
-          ),
-          Visibility(
-            visible: _showFetchWeatherButton,
-            child: ElevatedButton(
-              onPressed: _fetchWeather,
-              child: Text("Weather on my location"),
             ),
           ),
         ],

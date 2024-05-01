@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:simpleweather/forecast/forecast_page.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({Key? key}) : super(key: key);
@@ -86,7 +87,7 @@ class _WeatherPageState extends State<WeatherPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Error'),
-        content: Text('Failed to fetch weather data. Please try again later.'),
+        content: Text('Failed to fetch weather data. Please allow location access or try again later.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -208,8 +209,18 @@ Widget build(BuildContext context) {
                               hintStyle: TextStyle(color: Colors.white),
                               border: InputBorder.none, // Remove border
                               suffixIcon: _isLoading
-                                  ? CircularProgressIndicator()
-                                  : null,
+    ? SizedBox(
+        width: 20,
+        height: 20,
+        child: SpinKitDoubleBounce(
+          size: 20,
+          color: Colors.white,
+        ),
+      )
+    : null,
+
+
+
                             ),
                             onChanged: _onSearchTextChanged,
                             onSubmitted: (value) {

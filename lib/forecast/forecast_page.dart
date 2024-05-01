@@ -50,99 +50,111 @@ class _ForecastPageState extends State<ForecastPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-  backgroundColor: Colors.grey[900], // Set background color to grey
-  title: Text(
-    "${widget.weather?.cityName ?? "Location"}, ${widget.weather?.countryName ?? ""}",
-    style: TextStyle(
-      fontFamily: 'Helvetica',
-      fontSize: 20,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: Colors.grey[900], // Set background color to grey
+      title: Text(
+        "${widget.weather?.cityName ?? "Location"}, ${widget.weather?.countryName ?? ""}",
+        style: TextStyle(
+          fontFamily: 'Helvetica',
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
     ),
-  ),
-),
-
-      body: _forecastByDate == null
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _forecastByDate!.length,
-              itemBuilder: (context, index) {
-                final date = _forecastByDate!.keys.elementAt(index);
-                final forecastList = _forecastByDate![date]!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        date,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+    body: _forecastByDate == null
+        ? Center(child: CircularProgressIndicator(color: Colors.white,))
+        : ListView.builder(
+            itemCount: _forecastByDate!.length,
+            itemBuilder: (context, index) {
+              final date = _forecastByDate!.keys.elementAt(index);
+              final forecastList = _forecastByDate![date]!;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      date,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: forecastList.length,
-                      itemBuilder: (context, index) {
-                        final forecast = forecastList[index];
-                        return ListTile(
-                          title: Text(
-                            DateFormat('HH:mm').format(forecast.date),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.white, // Set text color to khaki
-                              fontFamily: 'Helvetica', // Set font family to Helvetica
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    '${forecast.temperature.round()}°C, ',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white, // Set text color to khaki
-                                      fontFamily: 'Helvetica', // Set font family to Helvetica
-                                    ),
-                                  ),
-                                  Text(
-                                    forecast.mainCondition,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white, // Set text color to khaki
-                                      fontFamily: 'Helvetica', // Set font family to Helvetica
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Humidity: ${forecast.humidity}%, Wind Speed: ${forecast.windSpeed.toStringAsFixed(2)} km/h',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white, // Set text color to white
-                                  fontFamily: 'Helvetica', // Set font family to Helvetica
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                    Divider(),
-                  ],
-                );
-              },
+                  ),
+                  ListView.builder(
+  shrinkWrap: true,
+  physics: NeverScrollableScrollPhysics(),
+  itemCount: forecastList.length,
+  itemBuilder: (context, index) {
+    final forecast = forecastList[index];
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0), // Add padding
+      child: Card(
+        elevation: 0, // Remove the shadow
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0), // Set border radius
+        ),
+        color: Colors.grey[700], // Set background color to grey
+        child: ListTile(
+          title: Text(
+            DateFormat('HH:mm').format(forecast.date),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.white, // Set text color to white
+              fontFamily: 'Helvetica', // Set font family to Helvetica
             ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '${forecast.temperature.round()}°C, ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white, // Set text color to white
+                      fontFamily: 'Helvetica', // Set font family to Helvetica
+                    ),
+                  ),
+                  Text(
+                    forecast.mainCondition,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white, // Set text color to white
+                      fontFamily: 'Helvetica', // Set font family to Helvetica
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Humidity: ${forecast.humidity}%, Wind Speed: ${forecast.windSpeed.toStringAsFixed(2)} km/h',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white, // Set text color to white
+                  fontFamily: 'Helvetica', // Set font family to Helvetica
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
-  }
+  },
+),
+
+
+                  Divider(),
+                ],
+              );
+            },
+          ),
+  );
+}
+
 }

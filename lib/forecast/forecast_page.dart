@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; 
 import 'package:simpleweather/models/weather_model.dart';
 import 'package:simpleweather/services/weather_service.dart';
+import 'package:lottie/lottie.dart';
 
 class ForecastPage extends StatefulWidget {
   final Weather? weather;
@@ -48,6 +49,48 @@ class _ForecastPageState extends State<ForecastPage> {
     }
     setState(() {});
   }
+
+ Widget buildConditionIcon(String condition) {
+  String animationAsset;
+  switch (condition.toLowerCase()) {
+    case 'clouds':
+      animationAsset = 'assets/windy.json';
+      break;
+    case 'mist':
+    case 'smoke':
+    case 'haze':
+    case 'dust':
+    case 'fog':
+      animationAsset = 'assets/mist.json';
+      break;
+    case 'rain':
+    case 'drizzle':
+    case 'shower rain':
+      animationAsset = 'assets/rainy.json';
+      break;
+    case 'thunder':
+    animationAsset = 'assets/thunder.json';
+    case 'thunderstorm':
+    case 'rainstorm':
+      animationAsset = 'assets/storm.json';
+      break;
+    case 'clear':
+      animationAsset = 'assets/sunny.json';
+      break;
+    case 'snow':
+      animationAsset = 'assets/snow.json';
+      break;
+    default:
+      animationAsset = 'assets/sunny.json';
+      break;
+  }
+  return Lottie.asset(
+    animationAsset,
+    width: 18,
+    height: 18,
+    fit: BoxFit.cover,
+  );
+}
 
   @override
 Widget build(BuildContext context) {
@@ -99,50 +142,46 @@ Widget build(BuildContext context) {
         ),
         color: Colors.grey[700], // Set background color to grey
         child: ListTile(
-          title: Text(
-            DateFormat('HH:mm').format(forecast.date),
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.white, // Set text color to white
-              fontFamily: 'Helvetica', // Set font family to Helvetica
-            ),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    '${forecast.temperature.round()}°C, ',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white, // Set text color to white
-                      fontFamily: 'Helvetica', // Set font family to Helvetica
-                    ),
-                  ),
-                  Text(
-                    forecast.mainCondition,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white, // Set text color to white
-                      fontFamily: 'Helvetica', // Set font family to Helvetica
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 4),
-              Text(
-                'Humidity: ${forecast.humidity}%, Wind Speed: ${forecast.windSpeed.toStringAsFixed(2)} km/h',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white, // Set text color to white
-                  fontFamily: 'Helvetica', // Set font family to Helvetica
-                ),
-              ),
-            ],
-          ),
+  title: Row(
+    children: [
+      Text(
+        DateFormat('HH:mm').format(forecast.date),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: Colors.white,
+          fontFamily: 'Helvetica',
         ),
+      ),
+      SizedBox(width: 5),
+      buildConditionIcon(forecast.mainCondition),
+    ],
+  ),
+  subtitle: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        '${forecast.temperature.round()}°C, ${forecast.mainCondition}',
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.white,
+          fontFamily: 'Helvetica',
+        ),
+      ),
+      SizedBox(height: 4),
+      Text(
+        'Humidity: ${forecast.humidity}%, Wind Speed: ${forecast.windSpeed.toStringAsFixed(2)} km/h',
+        style: TextStyle(
+          fontSize: 16,
+          color: Colors.white,
+          fontFamily: 'Helvetica',
+        ),
+      ),
+    ],
+  ),
+),
+
+
       ),
     );
   },

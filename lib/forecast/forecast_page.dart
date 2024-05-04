@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:simpleweather/models/weather_model.dart';
 import 'package:simpleweather/services/weather_service.dart';
 import 'package:lottie/lottie.dart';
+import 'package:country_flags/country_flags.dart';
 
 class ForecastPage extends StatefulWidget {
   final Weather? weather;
@@ -96,14 +97,49 @@ class _ForecastPageState extends State<ForecastPage> {
 Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
-      backgroundColor: Colors.grey[900], // Set background color to grey
-      title: Text(
-        "${widget.weather?.cityName ?? "Location"}, ${widget.weather?.countryName ?? ""}",
-        style: TextStyle(
-          fontFamily: 'Helvetica',
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+      backgroundColor: Colors.transparent, // Set app bar background color to transparent
+      elevation: 0, // Remove app bar elevation
+      title: Center( // Center the app bar title
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 35.0), // Add horizontal padding
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12.0), // Add vertical padding
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0), // Set border radius
+              color: Colors.grey[900], // Set background color to grey
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+              children: [
+                Text(
+                  "${widget.weather?.cityName ?? "Location"},",
+                  style: TextStyle(
+                    fontFamily: 'Helvetica',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 5), // Add some spacing between city name and flag
+                if (widget.weather?.countryName != null) // Check if countryName is available
+                  Text(
+                    "${widget.weather!.countryName} ", // Display countryName
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Helvetica',
+                    ),
+                  ),
+                if (widget.weather?.countryCode != null)
+                  CountryFlag.fromCountryCode(
+                    widget.weather!.countryCode.toLowerCase(),
+                    width: 24,
+                    height: 24,
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     ),
@@ -128,66 +164,85 @@ Widget build(BuildContext context) {
                     ),
                   ),
                   ListView.builder(
-  shrinkWrap: true,
-  physics: NeverScrollableScrollPhysics(),
-  itemCount: forecastList.length,
-  itemBuilder: (context, index) {
-    final forecast = forecastList[index];
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0), // Add padding
-      child: Card(
-        elevation: 0, // Remove the shadow
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0), // Set border radius
-        ),
-        color: Colors.grey[700], // Set background color to grey
-        child: ListTile(
-  title: Row(
-    children: [
-      Text(
-        DateFormat('HH:mm').format(forecast.date),
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-          color: Colors.white,
-          fontFamily: 'Helvetica',
-        ),
-      ),
-      SizedBox(width: 5),
-      buildConditionIcon(forecast.mainCondition),
-    ],
-  ),
-  subtitle: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        '${forecast.temperature.round()}°C, ${forecast.mainCondition}',
-        style: TextStyle(
-          fontSize: 18,
-          color: Colors.white,
-          fontFamily: 'Helvetica',
-        ),
-      ),
-      SizedBox(height: 4),
-      Text(
-        'Humidity: ${forecast.humidity}%, Wind Speed: ${forecast.windSpeed.toStringAsFixed(2)} km/h',
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.white,
-          fontFamily: 'Helvetica',
-        ),
-      ),
-    ],
-  ),
-),
-
-
-      ),
-    );
-  },
-),
-
-
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: forecastList.length,
+                    itemBuilder: (context, index) {
+                      final forecast = forecastList[index];
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0), // Add padding
+                        child: Card(
+                          elevation: 0, // Remove the shadow
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Set border radius
+                          ),
+                          color: Colors.grey[700], // Set background color to grey
+                          child: ListTile(
+                            title: Row(
+                              children: [
+                                Text(
+                                  DateFormat('HH:mm').format(forecast.date),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontFamily: 'Helvetica',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    buildConditionIcon(forecast.mainCondition),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      '${forecast.temperature.round()}°C, ${forecast.mainCondition}',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                        fontFamily: 'Helvetica',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.water_drop, color: Colors.white), // Humidity Icon
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Humidity: ${forecast.humidity}%',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontFamily: 'Helvetica',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.speed, color: Colors.white), // Wind Speed Icon
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Wind Speed: ${forecast.windSpeed.toStringAsFixed(2)} km/h',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontFamily: 'Helvetica',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   Divider(),
                 ],
               );
@@ -195,5 +250,8 @@ Widget build(BuildContext context) {
           ),
   );
 }
+
+
+
 
 }

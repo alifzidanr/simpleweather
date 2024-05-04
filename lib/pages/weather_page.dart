@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:simpleweather/forecast/forecast_page.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:country_flags/country_flags.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({Key? key}) : super(key: key);
@@ -254,26 +255,30 @@ Widget build(BuildContext context) {
             )
           : ForecastPage(weather: _weather), // Show ForecastPage when index is 1
       bottomNavigationBar: BottomNavigationBar(
-        onTap: onTabTapped,
-        currentIndex: _currentIndex,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.cloud),
-            label: 'Weather',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.access_time),
-            label: 'Forecast', // Label for ForecastPage
-          ),
-        ],
-      ),
+  onTap: onTabTapped,
+  currentIndex: _currentIndex,
+  backgroundColor: Colors.grey[900], // Sets the background color of the navigation bar
+  selectedItemColor: Colors.white, // Sets the color of the selected item (icon and label)
+  unselectedItemColor: Colors.white.withOpacity(0.5), // Sets the color of unselected items
+  items: [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.cloud, color: Colors.white), // Sets the color of the icon to white
+      label: 'Weather',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.access_time, color: Colors.white), // Sets the color of the icon to white
+      label: 'Forecast',
+    ),
+  ],
+),
+
     ),
   );
 }
 
 
 
-       Widget weatherBody() {
+   Widget weatherBody() {
   return SingleChildScrollView(
     child: Center(
       child: Column(
@@ -286,22 +291,102 @@ Widget build(BuildContext context) {
             size: 24,
           ),
           SizedBox(height: 8),
-          Text(
-            "${_weather?.cityName ?? "Location"}, ${_weather?.countryName ?? ""}",
-            // Display city name and country name if available
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                    "${_weather?.cityName ?? "Location"}, ${_weather?.countryName ?? ""}",
+                    style: TextStyle(
+                      fontFamily: 'Helvetica',
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+              SizedBox(width: 5), // Add spacing between city name and flag
+              if (_weather?.countryCode != null)
+                CountryFlag.fromCountryCode(
+                  _weather!.countryCode.toLowerCase(),
+                  width: 24,
+                  height: 24,
+                ),
+            ],
           ),
           Visibility(
             visible: _weather != null,
             child: Column(
               children: [
                 Lottie.asset(getWeatherAnimation(_weather?.mainCondition)),
-                SizedBox(height: 8), // Add vertical spacing between Lottie animation and temperature
-                Text(
-                  "${_weather?.temperature.round()}°C",
+                SizedBox(height: 0), // Add vertical spacing between Lottie animation and temperature
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "${_weather?.temperature.round()}°C",
+                    style: TextStyle(
+                      fontFamily: 'Helvetica',
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 2), // Add vertical spacing
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _weather?.mainCondition ?? "",
+                    style: TextStyle(
+                      fontFamily: 'Helvetica',
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
+                SizedBox(height: 8), // Add vertical spacing
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.water_drop,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Humidity: ${_weather?.humidity}%',
+                      style: TextStyle(
+                        fontFamily: 'Helvetica',
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  _weather?.mainCondition ?? "",
+                SizedBox(height: 4), // Add vertical spacing
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.speed,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Wind Speed: ${_weather?.windSpeed.toStringAsFixed(2)} km/h',
+                      style: TextStyle(
+                        fontFamily: 'Helvetica',
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
+
                 SizedBox(height: 16), // Add vertical padding between weather condition and button
                 Visibility(
                   visible: _showFetchWeatherButton,
@@ -321,5 +406,7 @@ Widget build(BuildContext context) {
     ),
   );
 }
+
+
 
   }

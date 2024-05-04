@@ -203,32 +203,78 @@ Widget build(BuildContext context) {
                             borderRadius: BorderRadius.circular(8.0), // Set border radius for the text field
                           ),
                           child: TextField(
-                            controller: textEditingController,
-                            focusNode: focusNode,
-                            decoration: InputDecoration(
-                              hintText: 'Search by city or country...',
-                              hintStyle: TextStyle(color: Colors.white),
-                              border: InputBorder.none, // Remove border
-                              suffixIcon: _isLoading
-    ? SizedBox(
-        width: 20,
-        height: 20,
-        child: SpinKitDoubleBounce(
-          size: 20,
-          color: Colors.white,
+  controller: textEditingController,
+  focusNode: focusNode,
+  decoration: InputDecoration(
+    hintText: 'Search by city or country...',
+    hintStyle: TextStyle(color: Colors.white),
+    border: InputBorder.none,
+    suffixIcon: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_isLoading)
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: SpinKitDoubleBounce(
+              size: 20,
+              color: Colors.white,
+            ),
+          ),
+        IconButton(
+          icon: Icon(Icons.info, color: Colors.white),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  title: Text(
+                    'Search engine is very flexible. How it works:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Helvetica',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  content: Text(
+                    'To make it more precise put the city\'s name, comma, 2-letter country code (ISO3166). You will get all proper cities in chosen country.\n\nThe order is important - the first is city name then comma then country. Example - London, GB or New York, US.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Helvetica',
+                      color: Colors.black, // Set the text color to black
+                    ),
+                  ),
+                  actions: [
+  TextButton(
+    onPressed: () {
+      Navigator.of(context).pop();
+    },
+    child: Text(
+      'OK',
+      style: TextStyle(
+        color: const Color.fromARGB(255, 48, 107, 50), // Set the button text color to grey[900]
+      ),
+    ),
+  ),
+],
+                );
+              },
+            );
+          },
         ),
-      )
-    : null,
-
-
-
-                            ),
-                            onChanged: _onSearchTextChanged,
-                            onSubmitted: (value) {
-                              _fetchWeatherByCity(value);
-                            },
-                            style: TextStyle(color: Colors.white), // Set text color for the text field
-                          ),
+      ],
+    ),
+  ),
+  onChanged: _onSearchTextChanged,
+  onSubmitted: (value) {
+    _fetchWeatherByCity(value);
+  },
+  style: TextStyle(color: Colors.white),
+  cursorColor: Colors.white,
+),
                         );
                       },
                     ),
@@ -254,20 +300,53 @@ Widget build(BuildContext context) {
               child: weatherBody(),
             )
           : ForecastPage(weather: _weather), // Show ForecastPage when index is 1
-      bottomNavigationBar: BottomNavigationBar(
-  onTap: onTabTapped,
-  currentIndex: _currentIndex,
-  backgroundColor: Colors.grey[900], // Sets the background color of the navigation bar
-  selectedItemColor: Colors.white, // Sets the color of the selected item (icon and label)
-  unselectedItemColor: Colors.white.withOpacity(0.5), // Sets the color of unselected items
-  items: [
-    BottomNavigationBarItem(
-      icon: Icon(Icons.cloud, color: Colors.white), // Sets the color of the icon to white
-      label: 'Weather',
+     bottomNavigationBar: Stack(
+  children: [
+    BottomNavigationBar(
+      onTap: onTabTapped,
+      currentIndex: _currentIndex,
+      backgroundColor: Colors.grey[900],
+      selectedItemColor: Colors.white,
+      unselectedItemColor: Colors.white.withOpacity(0.5),
+      showSelectedLabels: true,
+      showUnselectedLabels: true,
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.cloud, color: Colors.white),
+          label: 'Weather',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.access_time, color: Colors.white),
+          label: 'Forecast',
+        ),
+      ],
+      selectedIconTheme: IconThemeData(size: 30),
+      unselectedIconTheme: IconThemeData(size: 25),
+      selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+      selectedFontSize: 14,
+      unselectedFontSize: 12,
     ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.access_time, color: Colors.white), // Sets the color of the icon to white
-      label: 'Forecast',
+    Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        height: 3,
+        color: Colors.transparent,
+        alignment: Alignment.centerLeft,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          width: MediaQuery.of(context).size.width / 2,
+          margin: EdgeInsets.only(
+            left: _currentIndex == 0 ? 0 : MediaQuery.of(context).size.width / 2,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+      ),
     ),
   ],
 ),
@@ -317,7 +396,7 @@ Widget build(BuildContext context) {
             child: Column(
               children: [
                 Lottie.asset(getWeatherAnimation(_weather?.mainCondition)),
-                SizedBox(height: 0), // Add vertical spacing between Lottie animation and temperature
+                SizedBox(height: 16), // Add vertical spacing between Lottie animation and temperature
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                 children: [

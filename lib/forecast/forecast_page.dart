@@ -5,7 +5,6 @@ import 'package:simpleweather/services/weather_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/services.dart';
 
 
 class ForecastPage extends StatefulWidget {
@@ -27,10 +26,12 @@ class _ForecastPageState extends State<ForecastPage> {
     _fetchForecast();
   }
 
- _fetchForecast() async {
+_fetchForecast() async {
   try {
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
+      // Show dialog when there's no connectivity
+      _showNoLocationDialog();
       return;
     }
 
@@ -44,6 +45,54 @@ class _ForecastPageState extends State<ForecastPage> {
   } catch (e) {
     // Handle error
   }
+}
+
+void _showNoLocationDialog() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'No location',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 22,
+            fontFamily: 'Helvetica',
+            color: Colors.black,
+            fontWeight: FontWeight.bold, // Making the title bold
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/location.png',
+              height: 250,
+              width: 250,
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Please set the location up first.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Helvetica',
+                color: Colors.black,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
   void _groupForecastByDate(List<Weather> forecast) {

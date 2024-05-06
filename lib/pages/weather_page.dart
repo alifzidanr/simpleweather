@@ -29,6 +29,17 @@ class _WeatherPageState extends State<WeatherPage> {
     });
   }
 
+  void _checkConnectivity() async {
+  ConnectivityResult connectivityResult = await Connectivity().checkConnectivity();
+  if (connectivityResult != ConnectivityResult.none) {
+    _fetchWeatherForJakarta();
+  } else {
+    setState(() {
+      _showNoInternetDialog = true; // Show the dialog if there's no internet connectivity
+    });
+  }
+}
+
   Timer? _debounce;
   Map<String, List<String>> _cachedSuggestions = {};
   bool _isLoading = false;
@@ -70,30 +81,46 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _fetchWeatherForJakarta();
-  }
+void initState() {
+  super.initState();
+  _checkConnectivity();
+
+  // Add listener for connectivity changes
+  Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    if (result != ConnectivityResult.none) {
+      _fetchWeatherForJakarta();
+    } else {
+      setState(() {
+        _showNoInternetDialog = true; // Show the dialog if there's no internet connectivity
+      });
+    }
+  });
+}
+
 
   _fetchWeatherForJakarta() async {
-    try {
-      final connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
-        setState(() {
-          _showNoInternetDialog = true;
-        });
-        return;
-      }
-
-      final weather = await _weatherService.getWeather("Jakarta");
+  try {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
       setState(() {
-        _weather = weather;
-        _showFetchWeatherButton = true;
+        _showNoInternetDialog = true;
       });
-    } catch (e) {
-      // Handle error
+      return;
+    } else {
+      setState(() {
+        _showNoInternetDialog = false; // Hide the dialog if there's internet connectivity
+      });
     }
+
+    final weather = await _weatherService.getWeather("Jakarta");
+    setState(() {
+      _weather = weather;
+      _showFetchWeatherButton = true;
+    });
+  } catch (e) {
+    // Handle error
   }
+}
 
   _fetchWeather() async {
     try {
@@ -338,32 +365,37 @@ class _WeatherPageState extends State<WeatherPage> {
             Visibility(
   visible: _showNoInternetDialog,
   child: AlertDialog(
-    title: Text(
-      'No Connection',
-      style: TextStyle(
-        fontFamily: 'Helvetica',
-        fontSize: 22,
-        color: Colors.black,
-      ),
-    ),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          height: 200, // Adjust the height as per your requirement
-          width: 200, // Adjust the width as per your requirement
-          child: Image.asset('assets/error.png'),
-        ),
-        SizedBox(height: 8),
-        Text(
-          'Please connect to a network first.',
-          style: TextStyle(
-            fontFamily: 'Helvetica',
-            fontSize: 18,
-            color: Colors.black,
+    content: SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'No Connection',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Helvetica',
+              fontSize: 22,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
+          SizedBox(
+            height: 200, // Adjust the height as per your requirement
+            width: 200, // Adjust the width as per your requirement
+            child: Image.asset('assets/error.png'),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Please connect to a network first.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Helvetica',
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
     ),
     actions: [
       TextButton(
@@ -372,21 +404,16 @@ class _WeatherPageState extends State<WeatherPage> {
             _showNoInternetDialog = false;
           });
         },
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(Colors.green),
-          padding: MaterialStateProperty.all(EdgeInsets.symmetric(vertical: 10, horizontal: 20)), // Adjust padding as needed
-        ),
         child: Text(
           'OK',
-          style: TextStyle(
-            fontSize: 18, // Adjust font size as needed
-            color: Colors.white,
-          ),
         ),
       ),
     ],
   ),
 ),
+
+
+
 
 
           ],

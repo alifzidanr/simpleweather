@@ -4,6 +4,9 @@ import 'package:simpleweather/models/weather_model.dart';
 import 'package:simpleweather/services/weather_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:country_flags/country_flags.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/services.dart';
+
 
 class ForecastPage extends StatefulWidget {
   final Weather? weather;
@@ -24,19 +27,24 @@ class _ForecastPageState extends State<ForecastPage> {
     _fetchForecast();
   }
 
-  _fetchForecast() async {
+ _fetchForecast() async {
+  try {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      return;
+    }
+
     if (widget.weather != null) {
       final latitude = widget.weather!.latitude;
       final longitude = widget.weather!.longitude;
 
-      try {
-        final forecast = await _weatherService.getForecast(latitude, longitude);
-        _groupForecastByDate(forecast);
-      } catch (e) {
-        print(e);
-      }
+      final forecast = await _weatherService.getForecast(latitude, longitude);
+      _groupForecastByDate(forecast);
     }
+  } catch (e) {
+    // Handle error
   }
+}
 
   void _groupForecastByDate(List<Weather> forecast) {
     _forecastByDate = {};
@@ -320,4 +328,5 @@ class _ForecastPageState extends State<ForecastPage> {
       ),
     );
   }
+ 
 }
